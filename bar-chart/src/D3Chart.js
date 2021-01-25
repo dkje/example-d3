@@ -40,23 +40,19 @@ export default class D3Chart {
     vis.yAxisGroup = vis.svg.append("g");
 
     Promise.all([d3.json(menUrl), d3.json(womenUrl)]).then((datasets) => {
-      const [men, women] = datasets;
-      let flag = true;
-
-      vis.data = men;
-      vis.update();
-
-      d3.interval(() => {
-        vis.data = flag ? men : women;
-        console.log("update");
-        vis.update();
-        flag = !flag;
-      }, 1000);
+      vis.menData = datasets[0];
+      vis.womenData = datasets[1];
+      vis.update("men");
     });
   }
 
-  update() {
+  update(gender) {
+    console.log("update:", gender);
     const vis = this;
+    vis.data = gender === "men" ? vis.menData : vis.womenData;
+    // vis.xLabel.text(`The world's tallest ${gender}`);
+    if (!vis.data) return;
+
     // scale
     const max = d3.max(vis.data, (d) => d.height); // 가장 큰 키를 반환한다
     const min = d3.min(vis.data, (d) => d.height);
